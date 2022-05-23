@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  Refidas This template deploys a VPC 
+Resources:
+  RefidasServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      ImageId: ami-0022f774911c1d690
+      SecurityGroupIds:
+        - !Ref RefidasSecure
+      UserData:
+        Fn::Base64: !Sub |
+         #!/bin/bash
+         sudo yum update -y
+         sudo yum install -y httpd
+         sudo systemctl start httpd
+         sudo systemctl enable httpd
+
+  RefidasSecure:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: vpc-082f0debb1cd8ad44
+      GroupDescription: Allow ssh and http access
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          FromPort: 22
+          ToPort: 80
+          IpProtocol: tcp
+
+        - CidrIp: 0.0.0.0/0
+          FromPort: 80
+          ToPort: 80
+          IpProtocol: tcp
+      
+  
